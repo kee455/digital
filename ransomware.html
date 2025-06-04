@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simulasi Ransomware v4</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+    body {
+      margin: 0;
+      height: 100vh;
+      background: 
+        linear-gradient(135deg, #1a0000 0%, #000000 100%),
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M100,30 C130,20 170,25 170,60 C170,90 150,100 130,110 C150,130 170,160 150,180 C130,190 100,180 80,170 C60,180 30,190 10,180 C-10,160 10,130 30,110 C10,100 -10,90 10,60 C10,25 50,20 80,30 Z" fill="white" opacity="0.1"/></svg>');
+      background-size: cover, 400px;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: #ff0000;
+      font-family: 'Share Tech Mono', monospace;
+      text-align: center;
+      padding-top: 80px;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .glitch {
+      font-size: 40px;
+      position: relative;
+      display: inline-block;
+      animation: flicker 1.2s infinite;
+      letter-spacing: 2px;
+      margin-top: 20px;
+    }
+
+    .glitch::before, .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      width: 100%;
+      color: #ff1a1a;
+      background: transparent;
+      clip: rect(0, 0, 0, 0);
+    }
+
+    .glitch::before {
+      animation: glitchTop 0.7s infinite linear alternate-reverse;
+      left: 2px;
+      text-shadow: -2px 0 red;
+      clip: rect(2px, 9999px, 44px, 0);
+    }
+
+    .glitch::after {
+      animation: glitchBottom 0.9s infinite linear alternate-reverse;
+      left: -2px;
+      text-shadow: -2px 0 darkred;
+      clip: rect(50px, 9999px, 90px, 0);
+    }
+
+    @keyframes flicker {
+      0%, 18%, 22%, 25%, 53%, 57%, 100% {
+        opacity: 1;
+      }
+      20%, 24%, 55% {
+        opacity: 0.2;
+      }
+    }
+
+    @keyframes glitchTop {
+      0% {
+        clip: rect(2px, 9999px, 44px, 0);
+        transform: translate(0);
+      }
+      20% {
+        clip: rect(10px, 9999px, 40px, 0);
+        transform: translate(-2px, -2px);
+      }
+      40% {
+        clip: rect(2px, 9999px, 44px, 0);
+        transform: translate(2px, 2px);
+      }
+      60% {
+        clip: rect(15px, 9999px, 43px, 0);
+        transform: translate(-1px, 1px);
+      }
+      80% {
+        clip: rect(2px, 9999px, 44px, 0);
+        transform: translate(0);
+      }
+      100% {
+        clip: rect(5px, 9999px, 44px, 0);
+        transform: translate(1px, -1px);
+      }
+    }
+
+    @keyframes glitchBottom {
+      0% {
+        clip: rect(50px, 9999px, 90px, 0);
+        transform: translate(0);
+      }
+      20% {
+        clip: rect(55px, 9999px, 85px, 0);
+        transform: translate(2px, 2px);
+      }
+      40% {
+        clip: rect(50px, 9999px, 90px, 0);
+        transform: translate(-2px, -2px);
+      }
+      60% {
+        clip: rect(52px, 9999px, 88px, 0);
+        transform: translate(1px, -1px);
+      }
+      80% {
+        clip: rect(50px, 9999px, 90px, 0);
+        transform: translate(0);
+      }
+      100% {
+        clip: rect(53px, 9999px, 87px, 0);
+        transform: translate(-1px, 1px);
+      }
+    }
+
+    #countdown {
+      font-size: 34px;
+      margin: 30px 0;
+      animation: flicker 1s infinite;
+      letter-spacing: 3px;
+      font-weight: 700;
+    }
+
+    button {
+      background-color: #a10000;
+      color: #fff;
+      font-size: 20px;
+      padding: 15px 35px;
+      border: none;
+      margin-top: 25px;
+      cursor: pointer;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #ff0000;
+      animation: flicker 1.5s infinite;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #ff1a1a;
+      box-shadow: 0 0 25px #ff4d4d;
+    }
+
+    .crypto-box {
+      background-color: #120000;
+      color: white;
+      border: 1px solid #ff1a1a;
+      border-radius: 10px;
+      padding: 20px;
+      width: 320px;
+      margin: 25px auto;
+      box-shadow: 0 0 20px #ff0000aa inset;
+    }
+
+    .crypto-box input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      background-color: #220000;
+      color: #ff5555;
+      border: 1px solid #ff2a2a;
+      border-radius: 6px;
+      font-weight: 600;
+      font-family: monospace;
+      user-select: text;
+    }
+
+    /* Key Input Section */
+    .key-input-section {
+      background-color: #0a0000;
+      border: 1px solid #ff0000;
+      border-radius: 5px;
+      padding: 10px;
+      width: 175px;
+      margin: 20px auto 10px;
+      box-shadow: 0 0 7px #ff0000;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .key-input-section h3 {
+      color: #ff5555;
+      margin-bottom: 7px;
+      font-size: 12px;
+      text-shadow: 0 0 5px #ff0000;
+    }
+    
+    .key-input-container {
+      display: flex;
+      gap: 5px;
+    }
+    
+    #key-input {
+      flex: 1;
+      padding: 6px;
+      background-color: #220000;
+      color: #ff5555;
+      border: 1px solid #ff2a2a;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 9px;
+    }
+    
+    #submit-key {
+      padding: 6px 10px;
+      background-color: #a10000;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8px;
+      transition: all 0.3s;
+    }
+    
+    #submit-key:hover {
+      background-color: #ff1a1a;
+      box-shadow: 0 0 5px #ff0000;
+    }
+
+    /* Popup overlay */
+    #popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(20, 0, 0, 0.9);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      user-select: none;
+    }
+
+    #popup-box {
+      background-color: #330000;
+      border: 3px solid #ff0000;
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 40px #ff0000cc;
+      max-width: 400px;
+      color: #ff3333;
+      font-size: 24px;
+      font-weight: 700;
+      text-shadow: 0 0 15px #ff0000bb;
+      letter-spacing: 1.5px;
+      position: relative;
+      animation: popup-flicker 1.5s infinite;
+      text-align: center;
+    }
+
+    #popup-box button {
+      margin-top: 20px;
+      padding: 10px 25px;
+      background-color: #ff0000;
+      color: white;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 20px #ff4444;
+      transition: background-color 0.3s ease;
+    }
+
+    #popup-box button:hover {
+      background-color: #ff5555;
+      box-shadow: 0 0 30px #ff7777;
+    }
+    
+    /* Wrong Key Popup */
+    #wrong-key-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #330000;
+      border: 3px solid #ff0000;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 30px #ff0000cc;
+      width: 300px;
+      color: #ff3333;
+      font-size: 20px;
+      font-weight: 700;
+      text-shadow: 0 0 10px #ff0000bb;
+      letter-spacing: 1px;
+      z-index: 10000;
+      display: none;
+      text-align: center;
+    }
+    
+    #wrong-key-popup button {
+      margin-top: 15px;
+      padding: 8px 20px;
+      font-size: 16px;
+    }
+
+    @keyframes popup-flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+      20%, 40%, 60%, 80% { transform: translateX(10px); }
+    }
+    
+    .shake {
+      animation: shake 0.5s;
+    }
+
+  </style>
+</head>
+<body>
+
+
+  <div class="glitch" data-text="☠ HACKED BY ROKE BLACK-HAT ☠">☠ <S>HACKED BY ROKE BLACK-HAT</S> ☠</div>
+
+  <div class="glitch" data-text="☠☠☠☠ SEMUA FILE ANDA TELAH KAMI KUNCI! ☠☠☠☠">☠☠☠☠ SEMUA FILE ANDA TELAH KAMI KUNCI! ☠☠☠☠</div>
+
+  <P> <h3>lakukan pembayaran secepat mungkin sebelum waktu yang sudah kami tentukan habis, anda terlalu bodoh. WKWKWKWK </h3></P>
+
+  <div id="countdown">05:00:00</div>
+
+  <button id="key-button">Ambil Kuncinya</button>
+
+  <!-- Key Input Section -->
+  <div class="key-input-section">
+    <div class="key-input-container">
+      <input type="text" id="key-input" placeholder="Masukkan kunci di sini" />
+      <button id="submit-key">Enter</button>
+    </div>
+  </div>
+
+  <div class="crypto-box">
+    <label for="text">bayar menggunakan BITCOIN</label>
+    <input type="text" value="bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kygt080" readonly />
+    <input type="text" value="1.000.000 Rp" readonly />
+  </div>
+
+  <!-- Popup -->
+  <div id="popup-overlay">
+    <div id="popup-box">
+      Anda belum melakukan pembayaran! kunci akan muncul disini setelah anda berhasil melakukan pembayaran.
+      <br />
+      <button id="close-popup">Tutup</button>
+    </div>
+  </div>
+  
+  <!-- Wrong Key Popup -->
+  <div id="wrong-key-popup">
+    KUNCI SALAH!
+    <br />
+    <button id="close-wrong-popup">Coba Lagi</button>
+  </div>
+
+  <!-- Suara bisikan seram -->
+  <audio autoplay loop volume="0.15" id="ambient-sound">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-ghostly-whispers-2209.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script>
+    const countdownElement = document.getElementById("countdown");
+    const keyButton = document.getElementById("key-button");
+    const popupOverlay = document.getElementById("popup-overlay");
+    const closePopupBtn = document.getElementById("close-popup");
+    const submitKeyBtn = document.getElementById("submit-key");
+    const keyInput = document.getElementById("key-input");
+    const wrongKeyPopup = document.getElementById("wrong-key-popup");
+    const closeWrongPopupBtn = document.getElementById("close-wrong-popup");
+
+    let countDownTime = new Date().getTime() + 5 * 60 * 60 * 1000; // 5 jam
+
+    // Countdown function
+    const countdownInterval = setInterval(() => {
+      let now = new Date().getTime();
+      let distance = countDownTime - now;
+
+      if (distance < 0) {
+        clearInterval(countdownInterval);
+        countdownElement.innerText = "WAKTU HABIS!";
+        countdownElement.style.color = "#ff0000";
+        return;
+      }
+
+      let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      countdownElement.innerText =
+        (hours < 10 ? "0" : "") + hours + ":" +
+        (minutes < 10 ? "0" : "") + minutes + ":" +
+        (seconds < 10 ? "0" : "") + seconds;
+
+      // Color shift when time low
+      if (hours < 1) {
+        countdownElement.style.color = "#ff6600";
+      }
+      if (hours === 0 && minutes < 10) {
+        countdownElement.style.color = "#ffff00";
+      }
+      if (hours === 0 && minutes < 5) {
+        countdownElement.style.color = "#ffffff";
+      }
+    }, 1000);
+
+    // Button click to show popup
+    keyButton.addEventListener("click", () => {
+      popupOverlay.style.display = "flex";
+    });
+
+    // Close popup
+    closePopupBtn.addEventListener("click", () => {
+      popupOverlay.style.display = "none";
+    });
+    
+    // Submit key
+    submitKeyBtn.addEventListener("click", () => {
+      if (keyInput.value.trim() === "12345") {
+        // Kunci benar - ini hanya simulasi
+        alert("Kunci benar! Akses diberikan...");
+      } else {
+        // Kunci salah - tampilkan popup
+        keyInput.classList.add("shake");
+        setTimeout(() => keyInput.classList.remove("shake"), 500);
+        wrongKeyPopup.style.display = "block";
+      }
+    });
+    
+    // Close wrong key popup
+    closeWrongPopupBtn.addEventListener("click", () => {
+      wrongKeyPopup.style.display = "none";
+      keyInput.value = "";
+      keyInput.focus();
+    });
+    
+    // Submit dengan tombol Enter
+    keyInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        submitKeyBtn.click();
+      }
+    });
+  </script>
+
+</body>
+</html>
